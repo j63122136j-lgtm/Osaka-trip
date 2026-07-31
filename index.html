@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<!-- 讓網頁以手機適用的比例顯示，並防止自動縮放 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- 讓網頁加入主畫面的時侯變成全螢幕 App 模式 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2026 Osaka Shopping--3Cats parents</title>
+    <style>
+        :root {
+            --bg-color: #0c0c0e;
+            --card-bg: rgba(28, 28, 30, 0.85);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --text-color: #f5f5f7;
+            --text-secondary: #a1a1a6;
+            --accent: #2997ff;
+            --tab-active-bg: #ffffff;
+            --tab-active-text: #000000;
+            --gold: #f5a623;
+            --green: #30d158;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        html, body {
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 12px 16px;
+        }
+
+        .app-header {
+            flex-shrink: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 10px;
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .hero h1 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .offline-badge {
+            background: rgba(48, 209, 88, 0.15);
+            color: var(--green);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 6px 8px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.58rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .stat-value.highlight {
+            color: var(--accent);
+        }
+
+        .day-tabs {
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+
+        .day-tab {
+            flex-shrink: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 7px 10px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-color);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .day-tab.active {
+            background: var(--tab-active-bg);
+            color: var(--tab-active-text);
+            box-shadow: 0 4px 12px rgba(255,255,255,0.15);
+        }
+
+        .content-viewport {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 2px;
+            padding-bottom: 20px;
+            scrollbar-width: thin;
+        }
+
+        .content-viewport::-webkit-scrollbar {
+            width: 4px;
+        }
+        .content-viewport::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .day-section {
+            display: none;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        .day-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .timeline-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .card-image-box {
+            width: 100%;
+            height: 120px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: linear-gradient(to top, rgba(28,28,30,1), rgba(28,28,30,0));
+        }
+
+        .time-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card-content {
+            padding: 12px 14px;
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .spot-title {
+            font-size: 1.02rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+        }
+
+        .stars {
+            color: var(--gold);
+            font-size: 0.72rem;
+            white-space: nowrap;
+            margin-left: 8px;
+        }
+
+        .transit-strip {
+            display: flex;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+        }
+
+        .feature-box {
+            background: rgba(41, 151, 255, 0.08);
+            border-left: 3px solid var(--accent);
+            padding: 8px 10px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.78rem;
+            margin: 8px 0;
+            line-height: 1.4;
+        }
+
+        .feature-box strong {
+            color: #fff;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .tag-pill {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            background: rgba(255,255,255,0.06);
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .map-btn {
+            background: var(--text-color);
+            color: var(--bg-color);
+            padding: 5px 12px;
+            border-radius: 980px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .util-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .util-card h3 {
+            font-size: 0.92rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .checklist-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .check-item:active {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .check-item input {
+            accent-color: var(--accent);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .completed-text {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- 頂部導航 -->
+        <header class="app-header">
+            <div class="hero-top">
+                <div class="hero">
+                    <h1>2026 Osaka Shopping--3Cats parents</h1>
+                </div>
+                <div class="offline-badge">🐈社長 🐈‍⬛莫瓦 🦝半半</div>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-label">航班時間</div>
+                    <div class="stat-value">SL396 ⇄ 397</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">大阪實時天氣</div>
+                    <div class="stat-value highlight" id="weather-val">載入中...</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">清單完成度</div>
+                    <div class="stat-value" id="progress-val">0/13</div>
+                </div>
+            </div>
+
+            <div class="day-tabs">
+                <button class="day-tab active" onclick="switchTab('list-all')">🛒 採購清單</button>
+                <button class="day-tab" onclick="switchTab('day-1')">Day 1</button>
+                <button class="day-tab" onclick="switchTab('day-2')">Day 2</button>
+                <button class="day-tab" onclick="switchTab('day-3')">Day 3</button>
+                <button class="day-tab" onclick="switchTab('day-4')">Day 4</button>
+            </div>
+        </header>
+
+        <!-- 內容捲動視窗 -->
+        <div class="content-viewport">
+
+            <!-- ================= 採購清單 ================= -->
+            <div id="list-all" class="day-section active">
+                
+                <div class="util-card">
+                    <h3>🎒 戶外裝備 (Cotopaxi / Montbell / Vibram)</h3>
+                    <div class="checklist-grid">
+                        <label class="check-item"><input type="checkbox"> <span>Cotopaxi 50L 背包</span></label>
+                        <label class="check-item"><input type="checkbox"> <span>Cotopaxi 35/42L 背包</span></label>
+                        <label class="check-item"><input type="checkbox"> <span>Montbell 雨衣</span></label>
+                        <label class="check-item"><input type="checkbox"> <span>Montbell 快乾衣</span></label>
+                        <label class="check-item"><input type="checkbox"> <span>Vibram 五趾鞋</span></label>
+                    </div>
+                </div>
+
+                <div class="util-card">
+                    <h3>💊 藥妝與常備藥品</h3>
+                    <div class="checklist-grid">
+                        <label class="check-item"><input type="checkbox"> <span>大正腸胃藥</span></label>
+                        <label class="check-item"><input type="checkbox"> <span>大正A微粒感冒藥</span></label>
+                        <label class="check-item"><input type="checkbox"> <span>EVE 止痛藥</span></label>
+                        <label class="check-item"><input type="checkbox"> <span>休足時間 / 痠痛貼布</span></label>
+                    </div>
+                </div>
+
+                <div class="util-card">
+                    <h3>🎁 宅砲區：一番賞 & 模型</h3>
+                    <div class="checklist-grid">
+                        <label class="check-item"><input type="checkbox"> <span>一番賞抽爆 (多次累積)</span></label>
+                        <label class="check-item"><input type="checkbox"> <span>鋼彈模型 MG / RG</span></label>
+                        <label class="check-item"><input type="checkbox"> <span>絕版公仔 / 周邊玩具</span></label>
+                        <label class="check-item"><input type="checkbox"> <span>工具鉗子</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= DAY 1 ================= -->
+            <div id="day-1" class="day-section">
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1542640244-7e672d6cef4e?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">12:30</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">✈️ 抵達關西機場 T1</div>
+                            <div class="stars">SL396</div>
+                        </div>
+                        <div class="transit-strip">🎟️ 搭乘南海特急 Rapi:t 至難波，轉御堂筋線直達中津站</div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">14:00</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🏨 メゾンミラノ中津 (Check-in 寄放行李)</div>
+                        </div>
+                        <div class="feature-box"><strong>黃金基地：</strong>位於北區中津 1 丁目（緊鄰梅田商圈），放好行李後即可步行或搭 1 站地鐵展開行程！</div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">15:00</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🍜 人類みな麺類 (午餐)</div>
+                            <div class="stars">⭐⭐⭐⭐⭐</div>
+                        </div>
+                        <div class="feature-box"><strong>🔥 避開尖峰：</strong>下午吃剛好不用排太久！必點厚切叉燒、原味醬油拉麵。</div>
+                        <div class="card-footer">
+                            <span class="tag-pill">頂級拉麵</span>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Jinrui+Minaminenrui+Osaka" target="_blank" class="map-btn">📍 導航</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">16:30</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🎒 Cotopaxi Osaka</div>
+                        </div>
+                        <div class="feature-box"><strong>核心任務：</strong>位於 Grand Front Osaka (梅田，離中津步行超近)。直接鎖定 50L + 35/42L 雙包！</div>
+                        <div class="card-footer">
+                            <span class="tag-pill">戶外裝備</span>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Cotopaxi+Grand+Front+Osaka" target="_blank" class="map-btn">📍 導航</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">18:00</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">☕ GLITCH Coffee Osaka</div>
+                            <div class="stars">⭐⭐⭐⭐⭐</div>
+                        </div>
+                        <div class="feature-box"><strong>梅田散步：</strong>品嚐極致職人手沖，為等下的晚餐開胃。</div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">19:30</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🍣 根室花丸壽司 (晚餐)</div>
+                            <div class="stars">⭐⭐⭐⭐⭐</div>
+                        </div>
+                        <div class="feature-box"><strong>完美順路：</strong>位於梅田 LUCUA B2，吃完走路或搭一站地鐵即可輕鬆返回中津住所。</div>
+                        <div class="card-footer">
+                            <span class="tag-pill">人氣壽司</span>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Nemuro+Hanamaru+Lucua+Osaka" target="_blank" class="map-btn">📍 導航</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= DAY 2 ================= -->
+            <div id="day-2" class="day-section">
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">08:30</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">☕ PRONTO 中津店 / 連鎖咖啡早餐</div>
+                        </div>
+                        <div class="feature-box"><strong>中津順路早餐：</strong>從住處出發前往地鐵站途中，提供美味的西式吐司與熱咖啡，快速補給活力。</div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">10:30</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🎮 日本橋玩具街：Joshin 日本橋店 & SUPER KIDS LAND 本店</div>
+                        </div>
+                        <div class="feature-box"><strong>模型聖地：</strong>從中津搭御堂筋線直達難波，步行至日本橋電電城。主力攻陷模型、鋼彈與工具鉗子！</div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">12:00</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🎁 駿河屋 & Jungle 大阪日本橋本店</div>
+                        </div>
+                        <div class="feature-box"><strong>二手挖寶：</strong>緊接模型店行程，掃貨絕版公仔、懷舊周邊玩具與一番賞。</div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">13:30</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🥩 牛かつもと村 (炸牛排 午餐)</div>
+                            <div class="stars">⭐⭐⭐⭐⭐</div>
+                        </div>
+                        <div class="feature-box"><strong>完美銜接：</strong>逛完日本橋玩具街直接走到難波分店，享用石板現烤外酥內嫩的頂級炸牛排。</div>
+                        <div class="card-footer">
+                            <span class="tag-pill">頂級炸牛排</span>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Gyukatsu+Motomura+Namba" target="_blank" class="map-btn">📍 導航</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">15:00</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🛒 Bic Camera 難波店 / 道具與模型周邊補給</div>
+                        </div>
+                        <div class="feature-box"><strong>炸牛排與章魚燒之間：</strong>位於難波站旁，順路逛大型家電與模型工具、模型漆、組裝鉗等，滿足宅砲細節需求。</div>
+                        <div class="card-footer">
+                            <span class="tag-pill">模型工具</span>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Bic+Camera+Namba" target="_blank" class="map-btn">📍 導航</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1563245372-f21724e3856d?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">16:30</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🐙 わなか (Wanaka 章魚燒) & 道頓堀散策</div>
+                        </div>
+                        <div class="feature-box"><strong>下午茶：</strong>品嚐經典外酥內軟章魚燒，漫步道頓堀消化模型戰利品。</div>
+                        <div class="card-footer">
+                            <span class="tag-pill">章魚燒</span>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Takoyaki+Wanaka+Namba" target="_blank" class="map-btn">📍 導航</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">17:30</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🛍️ Don Quijote 唐吉訶德 道頓堀店</div>
+                        </div>
+                        <div class="feature-box"><strong>經典企鵝地標 (咚ペン)：</strong>章魚燒到晚餐之間，朝聖著名的道頓堀觀覽車與巨型藍色企鵝招牌，一次買齊藥妝、零食！</div>
+                        <div class="card-footer">
+                            <span class="tag-pill">藥妝伴手禮</span>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Don+Quijote+Dotonbori" target="_blank" class="map-btn">📍 導航</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1544148103-0773bf10d330?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">18:30</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🔥 燒肉 力丸 (晚餐)</div>
+                            <div class="stars">⭐⭐⭐⭐⭐</div>
+                        </div>
+                        <div class="feature-box"><strong>和牛吃到飽：</strong>難波/千日前高評價國產牛燒肉，大快朵頤後搭御堂筋線直奔中津回家！</div>
+                        <div class="card-footer">
+                            <span class="tag-pill">燒肉大餐</span>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Yakiniku+Rikimaru+Namba" target="_blank" class="map-btn">📍 導航</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= DAY 3 ================= -->
+            <div id="day-3" class="day-section">
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">08:30</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">☕ THE CITY BAKERY (グランフロント大阪)</div>
+                            <div class="stars">⭐⭐⭐⭐⭐</div>
+                        </div>
+                        <div class="feature-box"><strong>紐約風質感早餐：</strong>位於梅田 Grand Front Osaka。招牌 Pretzel Croissant（可頌）外脆內軟、伯爵茶司康與熱咖啡水準極高，為血拼日儲存完美體力。</div>
+                        <div class="card-footer">
+                            <span class="tag-pill">人氣咖啡烘焙</span>
+                            <a href="https://www.google.com/maps/search/?api=1&query=The+City+Bakery+Grand+Front+Osaka" target="_blank" class="map-btn">📍 導航</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1516594801573-7fc430c5de20?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">09:30</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🏘️ 中崎町復古文青街區散策</div>
+                            <div class="stars">⭐⭐⭐⭐</div>
+                        </div>
+                        <div class="feature-box"><strong>早餐到午餐順路景點：</strong>從梅田往東步行約 5-10 分鐘即達。這裡保留濃厚昭和風情舊民宅，巷弄藏有獨立選物店、古著屋與特色小店，適合悠閒散步拍照。</div>
+                        <div class="card-footer">
+                            <span class="tag-pill">文青散策</span>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Nakazakicho+Osaka" target="_blank" class="map-btn">📍 導航</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1628840042765-356cda07504e?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">11:30</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🍱 梅田 / KITTE 大阪 美食街 (午餐)</div>
+                        </div>
+                        <div class="feature-box"><strong>午餐補給：</strong>在中崎町散策結束後，就近在 LUCUA B2 美食街或新開幕的 KITTE 大阪享用美味午餐。</div>
+                        <div class="card-footer">
+                            <span class="tag-pill">商場美食</span>
+                            <a href="https://www.google.com/maps/search/?api=1&query=KITTE+Osaka" target="_blank" class="map-btn">📍 導航</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">12:45</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🛍️ 三井 Outlet Park 大阪門真</div>
+                        </div>
+                        <div class="transit-strip">🚇 梅田站搭地鐵轉乘京阪電車直達門真市站</div>
+                        <div class="feature-box"><strong>🔥 優先血拼策略：</strong>先逛 Outlet 撿便宜！把 Montbell 等戶外裝備的特價好物一次買齊。</div>
+                        <div class="card-footer">
+                            <span class="tag-pill">Outlet Mall</span>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Mitsui+Outlet+Park+Osaka+Kadoma" target="_blank" class="map-btn">📍 導航</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">15:00</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">☕ Outlet 內美食街 / 咖啡輕食 休憩補給</div>
+                            <div class="stars">⭐⭐⭐⭐</div>
+                        </div>
+                        <div class="feature-box"><strong>💡 逛街中場肚子餓對策：</strong>三井 Outlet Park 大阪門真內設有大型的美食廣場（Food Court）以及眾多咖啡輕食店（如 Tully's Coffee、Gong Cha 或美味烘焙點心）。血拼走到一半隨時可以坐下來喝杯咖啡、吃個點心解饞充電，不必擔心沒地方休息！</div>
+                        <div class="card-footer">
+                            <span class="tag-pill">Outlet 甜點休憩</span>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Mitsui+Outlet+Park+Osaka+Kadoma+Food+Court" target="_blank" class="map-btn">📍 導航</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1542640244-7e672d6cef4e?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">17:00</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🏢 Montbell 梅田旗艦店 / 友辦</div>
+                        </div>
+                        <div class="feature-box"><strong>缺貨備案與補齊：</strong>從 Outlet 返回市區後直奔梅田旗艦店，把剛剛在 Outlet 沒買到的款式、最新上市新品一次補齊！</div>
+                        <div class="card-footer">
+                            <span class="tag-pill">戶外旗艦店</span>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Montbell+Umeda+Osaka" target="_blank" class="map-btn">📍 導航</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">18:30</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🔥 挽肉と米 (炭火現絞漢堡排 晚餐)</div>
+                            <div class="stars">⭐⭐⭐⭐⭐</div>
+                        </div>
+                        <div class="feature-box"><strong>道地極致美味：</strong>品嚐現絞現烤、炭香四溢且肉汁爆發的極品日式漢堡排，搭配現煮羽釜白飯！</div>
+                        <div class="card-footer">
+                            <span class="tag-pill">炭火漢堡排</span>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Hikiniku+to+Kome+Namba+Parks" target="_blank" class="map-btn">📍 導航</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1508873696983-2df5c920ac1c?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">20:00</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🌙 難波 Parks 頂樓綠洲公園 & 難波漫步夜景</div>
+                        </div>
+                        <div class="feature-box"><strong>✨ 完美飯後散步：</strong>吃完「挽肉與米」就在 Namba Parks 購物中心，直接走上其標誌性的**階梯式空中庭園（Rooftop Parks）**。這裡燈光美氣氛佳、綠意盎然，非常適合夜晚散步、吹風、消化晚餐，還可以順便挑間舒服的酒吧喝一杯或散步回中津！</div>
+                        <div class="card-footer">
+                            <span class="tag-pill">空中庭園散步</span>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Namba+Parks+Rooftop+Garden" target="_blank" class="map-btn">📍 導航</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= DAY 4 ================= -->
+            <div id="day-4" class="day-section">
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">09:00</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">☕ 中津質感咖啡 / 早餐時光</div>
+                        </div>
+                        <div class="feature-box"><strong>悠閒退房：</strong>在住處周邊的中津巷弄享受最後的手沖咖啡與早餐，收拾行李準備退房。</div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="card-image-box" style="background-image: url('https://images.unsplash.com/photo-1542640244-7e672d6cef4e?w=800&auto=format&fit=crop&q=60')">
+                        <div class="time-badge">11:00</div>
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header-row">
+                            <div class="spot-title">🚄 移動至機場準備返台</div>
+                            <div class="stars">SL397 (13:30)</div>
+                        </div>
+                        <div class="transit-strip">從中津搭御堂筋線到難波轉南海特急 Rapi:t，或直接至大阪站搭乘 JR 快速列車直奔關西機場 T1！</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 頁籤切換邏輯
+        function switchTab(tabId) {
+            document.querySelectorAll('.day-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            const target = document.getElementById(tabId);
+            if (target) target.classList.add('active');
+
+            const tabs = document.querySelectorAll('.day-tab');
+            tabs.forEach(tab => {
+                if (tab.getAttribute('onclick').includes(tabId)) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            document.querySelector('.content-viewport').scrollTop = 0;
+        }
+
+        // Checklist 進度更新邏輯
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.checklist-grid input[type="checkbox"]');
+            const total = checkboxes.length;
+            let checkedCount = 0;
+            
+            checkboxes.forEach(cb => {
+                const textSpan = cb.nextElementSibling;
+                if (cb.checked) {
+                    checkedCount++;
+                    if(textSpan) textSpan.classList.add('completed-text');
+                } else {
+                    if(textSpan) textSpan.classList.remove('completed-text');
+                }
+            });
+            
+            document.getElementById('progress-val').innerText = `${checkedCount}/${total}`;
+        }
+
+        // 串接 Open-Meteo API 抓取大阪即時天氣
+        async function fetchWeather() {
+            try {
+                const response = `https://api.open-meteo.com/v1/forecast?latitude=34.6937&longitude=135.5022&current_weather=true`;
+                const res = await fetch(response);
+                const data = await res.json();
+                const temp = Math.round(data.current_weather.temperature);
+                const code = data.current_weather.weathercode;
+                
+                let emoji = '🌤️';
+                if (code === 0) emoji = '☀️';
+                else if (code >= 1 && code <= 3) emoji = '⛅';
+                else if (code >= 45 && code <= 48) emoji = '🌫️';
+                else if (code >= 51 && code <= 67) emoji = '🌧️';
+                else if (code >= 71 && code <= 82) emoji = '❄️';
+                else if (code >= 95) emoji = '⛈️';
+
+                document.getElementById('weather-val').innerText = `${emoji} ${temp}°C`;
+            } catch (error) {
+                document.getElementById('weather-val').innerText = '無網路';
+            }
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchWeather();
+            
+            const checkboxes = document.querySelectorAll('.checklist-grid input[type="checkbox"]');
+            
+            checkboxes.forEach((checkbox, index) => {
+                const savedState = localStorage.getItem('task_' + index);
+                if (savedState !== null) {
+                    checkbox.checked = savedState === 'true';
+                }
+                
+                checkbox.addEventListener('change', () => {
+                    localStorage.setItem('task_' + index, checkbox.checked);
+                    updateProgress();
+                });
+            });
+
+            updateProgress();
+        });
+    </script>
+</body>
+</html>
