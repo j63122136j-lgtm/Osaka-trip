@@ -1,27 +1,24 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<!-- 讓網頁以手機適用的比例顯示，並防止自動縮放 -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<!-- 讓網頁加入主畫面的時侯變成全螢幕 App 模式 -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>2026 Osaka Shopping--3Cats parents</title>
     <style>
         :root {
-            --bg-color: #0c0c0e;
-            --card-bg: rgba(28, 28, 30, 0.85);
+            --bg-color: #000000;
+            --card-bg: rgba(28, 28, 30, 0.75);
             --card-border: rgba(255, 255, 255, 0.12);
             --text-color: #f5f5f7;
-            --text-secondary: #a1a1a6;
+            --text-secondary: #86868b;
             --accent: #2997ff;
-            --tab-active-bg: #ffffff;
+            --tab-active-bg: rgba(255, 255, 255, 0.92);
             --tab-active-text: #000000;
             --gold: #f5a623;
             --green: #30d158;
+            --glass-blur: blur(20px);
         }
 
         * {
@@ -50,45 +47,53 @@
 
         .app-header {
             flex-shrink: 0;
-            padding-bottom: 10px;
+            padding-bottom: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            z-index: 10;
         }
 
         .hero-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .hero h1 {
-            font-size: 1.05rem;
-            font-weight: 700;
+            font-size: 1.1rem;
+            font-weight: 600;
             letter-spacing: -0.01em;
+            color: #f5f5f7;
         }
 
         .offline-badge {
             background: rgba(48, 209, 88, 0.15);
             color: var(--green);
-            padding: 3px 8px;
-            border-radius: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
             font-size: 0.65rem;
-            font-weight: 600;
+            font-weight: 500;
+            letter-spacing: -0.01em;
         }
 
         .stats-bar {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            margin-bottom: 8px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .stat-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            padding: 6px 8px;
-            border-radius: 10px;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            padding: 8px 10px;
+            border-radius: 12px;
             text-align: center;
         }
 
@@ -96,12 +101,14 @@
             font-size: 0.58rem;
             color: var(--text-secondary);
             text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
 
         .stat-value {
-            font-size: 0.75rem;
-            font-weight: 600;
+            font-size: 0.78rem;
+            font-weight: 500;
             margin-top: 2px;
+            color: #f5f5f7;
         }
 
         .stat-value.highlight {
@@ -110,29 +117,36 @@
 
         .day-tabs {
             display: flex;
-            gap: 4px;
+            gap: 6px;
             overflow-x: auto;
             padding-bottom: 2px;
+            scrollbar-width: none;
+        }
+
+        .day-tabs::-webkit-scrollbar {
+            display: none;
         }
 
         .day-tab {
             flex-shrink: 0;
-            background: var(--card-bg);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--card-border);
-            padding: 7px 10px;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--text-color);
+            padding: 8px 14px;
+            border-radius: 980px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--text-secondary);
             cursor: pointer;
             text-align: center;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .day-tab.active {
             background: var(--tab-active-bg);
             color: var(--tab-active-text);
-            box-shadow: 0 4px 12px rgba(255,255,255,0.15);
+            border-color: transparent;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2);
         }
 
         .content-viewport {
@@ -140,12 +154,12 @@
             overflow-y: auto;
             overflow-x: hidden;
             padding-right: 2px;
-            padding-bottom: 20px;
+            padding-bottom: 30px;
             scrollbar-width: thin;
         }
 
         .content-viewport::-webkit-scrollbar {
-            width: 4px;
+            width: 3px;
         }
         .content-viewport::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.2);
@@ -154,7 +168,7 @@
 
         .day-section {
             display: none;
-            animation: fadeIn 0.25s ease-out;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .day-section.active {
@@ -162,22 +176,25 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .timeline-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 16px;
-            margin-bottom: 12px;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: 20px;
+            margin-bottom: 14px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s ease;
         }
 
         .card-image-box {
             width: 100%;
-            height: 120px;
+            height: 130px;
             background-size: cover;
             background-position: center;
             position: relative;
@@ -188,26 +205,27 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 50px;
-            background: linear-gradient(to top, rgba(28,28,30,1), rgba(28,28,30,0));
+            height: 60px;
+            background: linear-gradient(to top, rgba(28, 28, 30, 0.9), rgba(28, 28, 30, 0));
         }
 
         .time-badge {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(10px);
+            top: 12px;
+            left: 12px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             color: #fff;
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            border: 1px solid rgba(255,255,255,0.1);
+            padding: 5px 10px;
+            border-radius: 980px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         .card-content {
-            padding: 12px 14px;
+            padding: 14px 16px;
         }
 
         .card-header-row {
@@ -218,10 +236,11 @@
         }
 
         .spot-title {
-            font-size: 1.02rem;
-            font-weight: 700;
+            font-size: 1.05rem;
+            font-weight: 600;
             letter-spacing: -0.01em;
-            line-height: 1.3;
+            line-height: 1.35;
+            color: #f5f5f7;
         }
 
         .stars {
@@ -235,21 +254,23 @@
             display: flex;
             gap: 8px;
             background: rgba(255, 255, 255, 0.04);
-            padding: 6px 10px;
-            border-radius: 8px;
-            margin: 8px 0;
-            font-size: 0.72rem;
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-size: 0.75rem;
             color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
         .feature-box {
-            background: rgba(41, 151, 255, 0.08);
+            background: rgba(41, 151, 255, 0.06);
             border-left: 3px solid var(--accent);
-            padding: 8px 10px;
-            border-radius: 0 8px 8px 0;
-            font-size: 0.78rem;
-            margin: 8px 0;
-            line-height: 1.4;
+            padding: 10px 12px;
+            border-radius: 0 10px 10px 0;
+            font-size: 0.8rem;
+            margin: 10px 0;
+            line-height: 1.45;
+            color: #d2d2d7;
         }
 
         .feature-box strong {
@@ -260,45 +281,56 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 10px;
-            padding-top: 8px;
-            border-top: 1px solid rgba(255,255,255,0.06);
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .tag-pill {
             font-size: 0.7rem;
             color: var(--text-secondary);
-            background: rgba(255,255,255,0.06);
-            padding: 3px 8px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 4px 10px;
             border-radius: 6px;
+            letter-spacing: -0.01em;
         }
 
         .map-btn {
-            background: var(--text-color);
-            color: var(--bg-color);
-            padding: 5px 12px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #000;
+            padding: 6px 14px;
             border-radius: 980px;
             font-size: 0.72rem;
-            font-weight: 600;
+            font-weight: 500;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 4px;
+            transition: background 0.2s;
+        }
+
+        .map-btn:active {
+            background: #fff;
+            transform: scale(0.96);
         }
 
         .util-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 14px;
-            padding: 14px;
-            margin-bottom: 12px;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
 
         .util-card h3 {
-            font-size: 0.92rem;
+            font-size: 0.95rem;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             color: var(--accent);
+            letter-spacing: -0.01em;
         }
 
         .checklist-grid {
@@ -312,12 +344,12 @@
             align-items: center;
             gap: 12px;
             background: rgba(255, 255, 255, 0.03);
-            padding: 10px 12px;
-            border-radius: 8px;
+            padding: 10px 14px;
+            border-radius: 12px;
             font-size: 0.85rem;
             border: 1px solid rgba(255, 255, 255, 0.05);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: background 0.2s;
         }
         
         .check-item:active {
@@ -344,7 +376,7 @@
         <header class="app-header">
             <div class="hero-top">
                 <div class="hero">
-                    <h1>2026 Osaka Trip--3 Cats Family</h1>
+                    <h1>2026 Osaka Trip</h1>
                 </div>
                 <div class="offline-badge">🐈社長 🐈‍⬛莫瓦 🦝半半</div>
             </div>
@@ -355,7 +387,7 @@
                     <div class="stat-value">SL396 ⇄ 397</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">大阪實時天氣</div>
+                    <div class="stat-label">大阪即時天氣</div>
                     <div class="stat-value highlight" id="weather-val">載入中...</div>
                 </div>
                 <div class="stat-card">
@@ -933,4 +965,3 @@
     </script>
 </body>
 </html>
-
