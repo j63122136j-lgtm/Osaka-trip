@@ -83,8 +83,9 @@
         .stats-bar {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            gap: 6px;
             margin-bottom: 10px;
+            width: 100%;
         }
 
         .stat-card {
@@ -92,26 +93,30 @@
             border: 1px solid var(--card-border);
             backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
-            padding: 8px 6px;
+            padding: 10px 4px;
             border-radius: 12px;
             text-align: center;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
 
         .stat-label {
-            font-size: 0.58rem;
+            font-size: 0.65rem;
             color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
         }
 
         .stat-value {
-            font-size: 0.78rem;
-            font-weight: 500;
-            margin-top: 2px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-top: 4px;
             color: #f5f5f7;
+            white-space: nowrap;
         }
 
         .stat-value.highlight {
@@ -119,16 +124,16 @@
         }
 
         .calc-input {
-            width: 100%;
+            width: 90%;
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 6px;
             color: #fff;
             text-align: center;
-            font-size: 0.78rem;
+            font-size: 0.95rem;
             font-weight: 600;
-            padding: 2px 0;
-            margin-top: 2px;
+            padding: 3px 0;
+            margin-top: 4px;
             outline: none;
         }
 
@@ -369,11 +374,6 @@
             height: 18px;
             cursor: pointer;
         }
-        
-        .completed-text {
-            text-decoration: line-through;
-            color: var(--text-secondary);
-        }
     </style>
 </head>
 <body>
@@ -390,15 +390,15 @@
 
             <div class="stats-bar">
                 <div class="stat-card">
-                    <div class="stat-label">大阪即時天氣</div>
+                    <div class="stat-label">大阪天氣</div>
                     <div class="stat-value highlight" id="weather-val">載入中...</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">日幣輸入 (JPY)</div>
-                    <input type="number" id="jpy-input" class="calc-input" value="1000" placeholder="輸入日幣">
+                    <div class="stat-label">日幣 (JPY)</div>
+                    <input type="number" id="jpy-input" class="calc-input" value="1000" placeholder="輸入金額">
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">折合台幣 (TWD)</div>
+                    <div class="stat-label">台幣 (TWD)</div>
                     <div class="stat-value highlight" id="twd-val">計算中...</div>
                 </div>
             </div>
@@ -692,7 +692,7 @@
                             <div class="spot-title">☕ SLOTH COFFEE ROASTERS 中津店</div>
                             <div class="stars">⭐⭐⭐⭐⭐</div>
                         </div>
-                        <div class="feature-box"><strong>☕ 美式咖啡 (Americano)：</strong>喝完再開逛，日本模式 ON！享受高品質的精品手沖與義式咖啡。</div>
+                        <div class="feature-box"><strong>☕ 美式咖啡 (Americano)：</strong>喝完再開逛，日本模式 ON！享受高品質的手沖與義式咖啡。</div>
                         <div class="card-footer">
                             <span class="tag-pill">質感咖啡</span>
                             <a href="https://www.google.com/maps/search/?api=1&query=Sloth+Coffee+Roasters+Nakatsu" target="_blank" class="map-btn">📍 導航</a>
@@ -836,7 +836,7 @@
                             <div class="spot-title">☕ THE CITY BAKERY (グランフロント大阪)</div>
                             <div class="stars">⭐⭐⭐⭐⭐</div>
                         </div>
-                        <div class="feature-box"><strong>紐約風質感早餐：</strong>位於梅田 Grand Front Osaka。招牌 Pretzel Croissant（可頌）外脆內軟、伯爵茶司康與熱咖啡水準極高，為血拼日儲存完美體力。</div>
+                        <div class="feature-box"><strong>紐約風質感早餐：</strong>位於梅田 Grand Front Osaka。招牌可頌外脆內軟、伯爵茶司康與熱咖啡水準極高，為血拼日儲存完美體力。</div>
                         <div class="card-footer">
                             <span class="tag-pill">人氣咖啡烘焙</span>
                             <a href="https://www.google.com/maps/search/?api=1&query=The+City+Bakery+Grand+Front+Osaka" target="_blank" class="map-btn">📍 導航</a>
@@ -907,7 +907,7 @@
                             <div class="spot-title">☕ Outlet 內美食街 / 咖啡輕食 休憩補給</div>
                             <div class="stars">⭐⭐⭐⭐</div>
                         </div>
-                        <div class="feature-box"><strong>💡 逛街中場肚子餓對策：</strong>三井 Outlet Park 大阪門真內設有大型的美食廣場（Food Court）以及眾多咖啡輕食店（如 Tully's Coffee、Gong Cha 或美味烘焙點心）。血拼走到一半隨時可以坐下來喝杯咖啡、吃個點心解饞充電，不必擔心沒地方休息！</div>
+                        <div class="feature-box"><strong>💡 逛街中場肚子餓對策：</strong>三井 Outlet Park 大阪門真內設有大型的美食廣場以及眾多咖啡輕食店。血拼走到一半隨時可以坐下來喝杯咖啡、吃個點心充電！</div>
                         <div class="card-footer">
                             <span class="tag-pill">Outlet 甜點休憩</span>
                             <a href="https://www.google.com/maps/search/?api=1&query=Mitsui+Outlet+Park+Osaka+Kadoma+Food+Court" target="_blank" class="map-btn">📍 導航</a>
@@ -959,7 +959,7 @@
                         <div class="card-header-row">
                             <div class="spot-title">🌙 難波 Parks 頂樓綠洲公園 & 難波漫步夜景</div>
                         </div>
-                        <div class="feature-box"><strong>✨ 完美飯後散步：</strong>吃完「挽肉與米」就在 Namba Parks 購物中心，直接走上其標誌性的**階梯式空中庭園（Rooftop Parks）**。這裡燈光美氣氛佳、綠意盎然，非常適合夜晚散步、吹風、消化晚餐，還可以順便挑間舒服的酒吧喝一杯或散步回中津！</div>
+                        <div class="feature-box"><strong>✨ 完美飯後散步：</strong>吃完「挽肉與米」就在 Namba Parks 購物中心，直接走上其標誌性的階梯式空中庭園。燈光美氣氛佳、綠意盎然，非常適合散步吹風消化晚餐！</div>
                         <div class="card-footer">
                             <span class="tag-pill">空中庭園散步</span>
                             <a href="https://www.google.com/maps/search/?api=1&query=Namba+Parks+Rooftop+Garden" target="_blank" class="map-btn">📍 導航</a>
