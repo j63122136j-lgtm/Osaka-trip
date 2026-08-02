@@ -92,9 +92,12 @@
             border: 1px solid var(--card-border);
             backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
-            padding: 8px 10px;
+            padding: 8px 6px;
             border-radius: 12px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .stat-label {
@@ -113,6 +116,24 @@
 
         .stat-value.highlight {
             color: var(--accent);
+        }
+
+        .calc-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: #fff;
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 2px 0;
+            margin-top: 2px;
+            outline: none;
+        }
+
+        .calc-input:focus {
+            border-color: var(--accent);
         }
 
         .day-tabs {
@@ -189,7 +210,6 @@
             margin-bottom: 14px;
             overflow: hidden;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            transition: transform 0.2s ease;
         }
 
         .card-image-box {
@@ -292,7 +312,6 @@
             background: rgba(255, 255, 255, 0.06);
             padding: 4px 10px;
             border-radius: 6px;
-            letter-spacing: -0.01em;
         }
 
         .map-btn {
@@ -306,12 +325,6 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            transition: background 0.2s;
-        }
-
-        .map-btn:active {
-            background: #fff;
-            transform: scale(0.96);
         }
 
         .util-card {
@@ -330,7 +343,6 @@
             font-weight: 600;
             margin-bottom: 12px;
             color: var(--accent);
-            letter-spacing: -0.01em;
         }
 
         .checklist-grid {
@@ -349,11 +361,6 @@
             font-size: 0.85rem;
             border: 1px solid rgba(255, 255, 255, 0.05);
             cursor: pointer;
-            transition: background 0.2s;
-        }
-        
-        .check-item:active {
-            background: rgba(255, 255, 255, 0.08);
         }
 
         .check-item input {
@@ -383,16 +390,16 @@
 
             <div class="stats-bar">
                 <div class="stat-card">
-                    <div class="stat-label">航班時間</div>
-                    <div class="stat-value">SL396 ⇄ 397</div>
-                </div>
-                <div class="stat-card">
                     <div class="stat-label">大阪即時天氣</div>
                     <div class="stat-value highlight" id="weather-val">載入中...</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">清單完成度</div>
-                    <div class="stat-value" id="progress-val">0/13</div>
+                    <div class="stat-label">日幣輸入 (JPY)</div>
+                    <input type="number" id="jpy-input" class="calc-input" value="1000" placeholder="輸入日幣">
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">折合台幣 (TWD)</div>
+                    <div class="stat-value highlight" id="twd-val">計算中...</div>
                 </div>
             </div>
 
@@ -410,7 +417,6 @@
 
             <!-- ================= 採購清單 ================= -->
             <div id="list-all" class="day-section active">
-                
                 <div class="util-card">
                     <h3>🎒 戶外裝備 (Cotopaxi / Montbell / Vibram)</h3>
                     <div class="checklist-grid">
@@ -1004,6 +1010,8 @@
     </div>
 
     <script>
+        let currentRate = 0.205; // 預設匯率備份
+
         // 頁籤切換邏輯
         function switchTab(tabId) {
             document.querySelectorAll('.day-section').forEach(el => {
@@ -1023,27 +1031,28 @@
             document.querySelector('.content-viewport').scrollTop = 0;
         }
 
-        // Checklist 進度更新邏輯
-        function updateProgress() {
-            const checkboxes = document.querySelectorAll('.checklist-grid input[type="checkbox"]');
-            const total = checkboxes.length;
-            let checkedCount = 0;
-            
-            checkboxes.forEach(cb => {
-                const textSpan = cb.nextElementSibling;
-                if (cb.checked) {
-                    checkedCount++;
-                    if(textSpan) textSpan.classList.add('completed-text');
-                } else {
-                    if(textSpan) textSpan.classList.remove('completed-text');
-                }
-            });
-            
-            document.getElementById('progress-val').innerText = `${checkedCount}/${total}`;
+        // 匯率換算邏輯
+        function convertCurrency() {
+            const jpyVal = parseFloat(document.getElementById('jpy-input').value) || 0;
+            const twd = Math.round(jpyVal * currentRate);
+            document.getElementById('twd-val').innerText = `NT$ ${twd.toLocaleString()}`;
         }
 
-        // 串接 Open-Meteo API 抓取大阪即時天氣
-        async function fetchWeather() {
+        // 抓取即時匯率與大阪天氣
+        async function fetchLiveData() {
+            // 1. 抓取匯率 (使用 exchangerate-api)
+            try {
+                const res = await fetch('https://open.er-api.com/v6/latest/JPY');
+                const data = await res.json();
+                if (data && data.rates && data.rates.TWD) {
+                    currentRate = data.rates.TWD;
+                }
+            } catch (e) {
+                console.log('使用預設匯率');
+            }
+            convertCurrency();
+
+            // 2. 抓取大阪即時天氣
             try {
                 const response = `https://api.open-meteo.com/v1/forecast?latitude=34.6937&longitude=135.5022&current_weather=true`;
                 const res = await fetch(response);
@@ -1067,23 +1076,20 @@
 
         // 初始化
         document.addEventListener('DOMContentLoaded', () => {
-            fetchWeather();
-            
+            fetchLiveData();
+
+            document.getElementById('jpy-input').addEventListener('input', convertCurrency);
+
             const checkboxes = document.querySelectorAll('.checklist-grid input[type="checkbox"]');
-            
             checkboxes.forEach((checkbox, index) => {
                 const savedState = localStorage.getItem('task_' + index);
                 if (savedState !== null) {
                     checkbox.checked = savedState === 'true';
                 }
-                
                 checkbox.addEventListener('change', () => {
                     localStorage.setItem('task_' + index, checkbox.checked);
-                    updateProgress();
                 });
             });
-
-            updateProgress();
         });
     </script>
 </body>
